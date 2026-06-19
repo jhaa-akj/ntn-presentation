@@ -515,7 +515,7 @@
                 <h1 style="font-size: 4.8rem; font-weight: 900; line-height: 1.1; margin-bottom: 1.5rem; background: linear-gradient(to right, #ffffff, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                     Non-Terrestrial Networks
                 </h1>
-                <h2 style="font-size: 2.2rem; font-weight: 400; color: var(--text-muted); margin-bottom: 3.5rem; max-width: 1000px;">
+                <h2 style="font-size: 2.2rem; font-weight: 400; color: var(--text-muted); margin-bottom: 2rem; max-width: 1000px;">
                     Technical Architecture, Physical Layer Innovations & Solving Space-to-Ground Physics
                 </h2>
                 <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem 3rem; display: flex; gap: 1.5rem; font-size: 1.15rem;">
@@ -524,6 +524,10 @@
                     <div><span style="color: var(--accent-cyan)">Environment:</span> Space-to-Device</div>
                     <div style="border-right: 1px solid var(--border-color)"></div>
                     <div><span style="color: var(--accent-cyan)">Target:</span> Direct-to-Device (D2D)</div>
+                </div>
+                <!-- Presenter Pill Badge (Pushed to bottom and highlighted) -->
+                <div style="font-size: 1.2rem; font-weight: 600; color: #ffffff; margin-top: 2rem; background: rgba(0, 242, 254, 0.05); border: 1.5px solid var(--accent-cyan); border-radius: 50px; padding: 0.5rem 2rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: var(--glow-shadow);">
+                    <span style="opacity: 0.85; font-size: 1.1rem;">Presenter:</span> <span style="color: var(--accent-cyan); font-weight: 800; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">Abhinav Jha</span> <span style="color: var(--text-muted); font-weight: normal; font-size: 1.05rem;">(jhaa@motorola.com)</span>
                 </div>
                 <div style="margin-top: 1.5rem; color: var(--text-muted); font-size: 1.05rem;">
                     Press <span style="border: 1px solid #475569; padding: 3px 8px; border-radius: 4px; background: #1e293b; color: white;">Right Arrow</span> or use the buttons below to navigate
@@ -1514,8 +1518,8 @@
                     </div>
                     <!-- Play buttons -->
                     <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
-                        <button class="btn btn-active" style="flex: 1;" onclick="toggleBeamHopping('reuse')">Show Frequency Reuse! 🟢</button>
-                        <button class="btn" style="flex: 1; border-color: var(--accent-cyan);" onclick="toggleBeamHopping('hop')">Simulate Beam Hopping! ⚡</button>
+                        <button id="btn-beam-reuse" class="btn btn-active" style="flex: 1;" onclick="toggleBeamHopping('reuse')">Show Frequency Reuse! 🟢</button>
+                        <button id="btn-beam-hop" class="btn" style="flex: 1; border-color: var(--accent-cyan);" onclick="toggleBeamHopping('hop')">Simulate Beam Hopping! ⚡</button>
                     </div>
                 </div>
                 <div class="visual-container" style="background-color: #050711;">
@@ -1738,6 +1742,9 @@
         // Slide 13: Spot Beam & Beam Hopping Simulator
         let hoppingAnimationId = null;
         function toggleBeamHopping(mode) {
+            const btnReuse = document.getElementById('btn-beam-reuse');
+            const btnHop = document.getElementById('btn-beam-hop');
+
             const beamCone1 = document.getElementById('beamCone1');
             const beamCone2 = document.getElementById('beamCone2');
             const beamCone3 = document.getElementById('beamCone3');
@@ -1754,18 +1761,27 @@
                 hoppingAnimationId = null;
             }
 
-            // Restore all to active standby
+            // Restore all to active standby (Explicitly reset displays AND opacities)
             beamCone1.style.display = 'block';
             beamCone2.style.display = 'block';
             beamCone3.style.display = 'block';
+            
+            beamCone1.style.opacity = '1.0';
+            beamCone2.style.opacity = '1.0';
+            beamCone3.style.opacity = '1.0';
+
             cell1.style.display = 'block';
             cell2.style.display = 'block';
             cell3.style.display = 'block';
+            
             lbl1.style.display = 'block';
             lbl2.style.display = 'block';
             lbl3.style.display = 'block';
 
             if (mode === 'reuse') {
+                btnReuse.classList.add('btn-active');
+                btnHop.classList.remove('btn-active');
+
                 // Static Frequency Reuse presentation: Set distinct colors
                 beamCone1.setAttribute('fill', 'rgba(0, 242, 254, 0.15)');
                 beamCone2.setAttribute('fill', 'rgba(56, 189, 248, 0.15)');
@@ -1783,6 +1799,9 @@
                 lbl2.setAttribute('fill', '#38bdf8');
                 lbl3.setAttribute('fill', '#f43f5e');
             } else {
+                btnReuse.classList.remove('btn-active');
+                btnHop.classList.add('btn-active');
+
                 // Beam Hopping mode: Animate active beams switching dynamically
                 let activeBeam = 1;
                 lbl1.innerText = "STANDBY";
@@ -1794,7 +1813,7 @@
                 lbl3.setAttribute('fill', '#475569');
 
                 hoppingAnimationId = setInterval(() => {
-                    // Turn off all beams
+                    // Turn off all beams (Dim opacity)
                     beamCone1.style.opacity = '0.05';
                     beamCone2.style.opacity = '0.05';
                     beamCone3.style.opacity = '0.05';
@@ -1806,6 +1825,10 @@
                     lbl1.innerText = "OFF";
                     lbl2.innerText = "OFF";
                     lbl3.innerText = "OFF";
+
+                    lbl1.setAttribute('fill', '#475569');
+                    lbl2.setAttribute('fill', '#475569');
+                    lbl3.setAttribute('fill', '#475569');
 
                     if (activeBeam === 1) {
                         beamCone1.style.opacity = '1.0';
